@@ -1,0 +1,1 @@
+# msa-sync-readwrite-springboot-kafka-mysql-mongodb-elasticsearch
