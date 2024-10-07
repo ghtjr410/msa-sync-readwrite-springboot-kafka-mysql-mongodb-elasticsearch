@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.4</version>
-        <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
+        <relativePath>./pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.programming.ghtjr</groupId>
     <artifactId>1003-msa-sync-readwrite-springboot-kafka-mysql-mongodb-elasticsearch</artifactId>
@@ -16,6 +16,7 @@
     <name>1003-msa-sync-readwrite-springboot-kafka-mysql-mongodb-elasticsearch</name>
     <modules>
         <module>api-gateway</module>
+        <module>userprofile-service</module>
         <module>image-service</module>
         <module>post-service</module>
     </modules>
