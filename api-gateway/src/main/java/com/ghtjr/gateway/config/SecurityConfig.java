@@ -1,5 +1,7 @@
 package com.ghtjr.gateway.config;
 
+import com.ghtjr.gateway.filter.CustomHeaderRemovalFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,9 +21,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig  {
-
+    // 인증 필요없는 URL
     private final String[] freeResourceUrls = {"/actuator/prometheus"};
+    // 제거할 헤더 목록을 설정합니다.
+    private final List<String> headersToRemove = List.of("X-User-Roles", "X-User-Sub");
+
+    private final CustomHeaderRemovalFilter customHeaderRemovalFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -33,6 +40,7 @@ public class SecurityConfig  {
                     .anyRequest().authenticated())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                .addFilterBefore(customHeaderRemovalFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
