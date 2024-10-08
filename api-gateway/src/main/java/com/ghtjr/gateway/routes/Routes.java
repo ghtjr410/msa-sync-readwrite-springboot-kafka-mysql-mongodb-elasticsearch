@@ -56,11 +56,18 @@ public class Routes {
             if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
                 Jwt jwt = (Jwt) authentication.getPrincipal();
                 String sub = jwt.getSubject();
+                // JWT에서 roles 추출
+                Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
+                List<String> roles = extractRealmRoles(realmAccess);
+
+                // roles를 쉼표로 구분된 문자열로 변환
+                String rolesHeader = String.join(",", roles);
 
 //              // 요청 헤더에 추가
                 HttpServletRequest servletRequest = request.servletRequest();
                 HeaderMapRequestWrapper requestWrapper = new HeaderMapRequestWrapper(servletRequest);
                 requestWrapper.addHeader("X-User-Sub", sub);
+                requestWrapper.addHeader("X-User-Roles", rolesHeader );
 
                 // 새로운 ServerRequest 생성
                 ServerRequest newRequest = ServerRequest.create(requestWrapper, request.messageConverters());
@@ -70,6 +77,13 @@ public class Routes {
                 return next.handle(request);
             }
         };
+    }
+    // JWT에서 roles를 추출하는 메서드 추가
+    private List<String> extractRealmRoles(Map<String, Object> realmAccess) {
+        if (realmAccess == null || !realmAccess.containsKey("roles")) {
+            return Collections.emptyList();
+        }
+        return (List<String>) realmAccess.get("roles");
     }
     // HeaderMapRequestWrapper 클래스 추가
     private static class HeaderMapRequestWrapper extends HttpServletRequestWrapper {

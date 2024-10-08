@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -25,9 +26,6 @@ import java.util.stream.Collectors;
 public class SecurityConfig  {
     // 인증 필요없는 URL
     private final String[] freeResourceUrls = {"/actuator/prometheus"};
-    // 제거할 헤더 목록을 설정합니다.
-    private final List<String> headersToRemove = List.of("X-User-Roles", "X-User-Sub");
-
     private final CustomHeaderRemovalFilter customHeaderRemovalFilter;
 
     @Bean
@@ -40,7 +38,7 @@ public class SecurityConfig  {
                     .anyRequest().authenticated())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-                .addFilterBefore(customHeaderRemovalFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(customHeaderRemovalFilter, UsernamePasswordAuthenticationFilter.class) // 커스텀 헤더 제거
                 .build();
     }
 
