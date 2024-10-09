@@ -10,8 +10,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,21 +24,24 @@ import java.util.stream.Collectors;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig  {
+    private final CustomHeaderRemovalFilter customHeaderRemovalFilter;
+
     // 인증 필요없는 URL
     private final String[] freeResourceUrls = {"/actuator/prometheus"};
-    private final CustomHeaderRemovalFilter customHeaderRemovalFilter;
+    private final String[] userOnlyResourceUrls = {"/api/v1/profile/**", "/api/v1/images/**"};
+    private final String[] adminOnlyResourceUrls = {"/api/v1/admin/**"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(freeResourceUrls).permitAll()
-                    .requestMatchers("/api/user/**").hasRole("user")
-                    .requestMatchers("/api/admin/**").hasRole("admin")
+                    .requestMatchers(userOnlyResourceUrls).hasRole("user")
+                    .requestMatchers(adminOnlyResourceUrls).hasRole("admin")
                     .anyRequest().authenticated())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-                .addFilterBefore(customHeaderRemovalFilter, UsernamePasswordAuthenticationFilter.class) // 커스텀 헤더 제거
+                .addFilterBefore(customHeaderRemovalFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
