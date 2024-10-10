@@ -45,6 +45,7 @@ public class KeycloakAdminService {
             // 오류 처리
             throw new RuntimeException("Failed to delete user in Keycloak");
         }
+
     }
 
     private String getAdminAccessToken() {

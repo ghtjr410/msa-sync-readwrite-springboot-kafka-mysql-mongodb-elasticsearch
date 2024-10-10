@@ -1,6 +1,7 @@
 package com.ghtjr.user.controller;
 
 import com.ghtjr.user.service.KeycloakAdminService;
+import com.ghtjr.user.service.UserDeletedEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController {
 
     private final KeycloakAdminService keycloakAdminService;
+    private final UserDeletedEventPublisher eventPublisher;
 
     @DeleteMapping("/account/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -25,7 +27,6 @@ public class AccountController {
         // Keycloak에서 사용자 삭제
         keycloakAdminService.deleteUser(userId);
         // 회원 탈퇴 이벤트 발행 (예: Kafka)
-        // eventPublisher.publishUserDeletedEvent(userId);
-
+        eventPublisher.publishUserDeletedEvent(userId);
     }
 }
