@@ -28,7 +28,7 @@ public class SecurityConfig  {
 
     // 인증 필요없는 URL
     private final String[] freeResourceUrls = {"/actuator/prometheus"};
-    private final String[] userOnlyResourceUrls = {"/api/v1/profile/**", "/api/v1/images/**"};
+    private final String[] userOnlyResourceUrls = {"/api/v1/profile/**", "/api/v1/images/**", "api/v1/user/**"};
     private final String[] adminOnlyResourceUrls = {"/api/v1/admin/**"};
 
     @Bean
@@ -66,8 +66,10 @@ public class SecurityConfig  {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.applyPermitDefaultValues();
+        configuration.applyPermitDefaultValues(); // A
+//        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // B
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+//        configuration.setAllowedHeaders(List.of("*")); // B
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
